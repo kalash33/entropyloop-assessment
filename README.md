@@ -17,7 +17,18 @@ Status: work in progress (Nov 2026). Author: Kalash Poddar (90259149+kalash33@us
 4. Run `ea_non_iid` and `ea_iid` (`scripts/run_90b.sh`), then the restart test on 1,000 x 1,000 restart data when a device is available.
 
 ## Results
-(to be filled: min-entropy per symbol for each mapping and window, IID test outcome, stability across windows)
+Run on GitHub Actions (public log, NIST tool commit in `results/nist_tool_commit.txt`). Five 1,000,000-sample windows, non-IID estimator. Full table: [`results/SUMMARY.md`](results/SUMMARY.md).
+
+| mapping | bits per symbol | min-entropy per symbol (range over 5 windows) |
+|---|---|---|
+| low 8 bits | 8 | 6.05 to 6.23 |
+| top 8 bits (`q8`) | 8 | 2.72 to 2.81 |
+| top 4 bits (`high4`) | 4 | 0.40 to 0.40 |
+
+- Estimates are stable across the five windows, which are spread across the capture.
+- The IID test (first window only) failed for `low8` and `q8`, so the non-IID estimates are the ones to use. That is the expected outcome for a physical source with some structure.
+- Most of the entropy is in the low-order bits, as expected for ADC noise.
+- These are lower bounds for this capture only (see Limits).
 
 ## Limits (read first)
 - One capture, from one device, made by a third party. It says nothing general about the EntropyLoop design or about other builds.

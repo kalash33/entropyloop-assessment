@@ -22,4 +22,3 @@
    (With a 200 MB slice, use offsets 0 20000000 40000000 60000000 instead.)
 
 4. Summarise: python3 scripts/summarise.py results > results/SUMMARY.md
-   Then send me results/SUMMARY.md and I will help write the note.
