@@ -1,0 +1,79 @@
+name: SP 800-90B assessment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/assess.yml"
+      - "scripts/**"
+
+permissions:
+  contents: write
+
+jobs:
+  assess:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      URL: https://files.picoweather.net/samples.bin
+      WINDOW: "1000000"          # samples per window (90B minimum)
+      OFFSETS: "0 2000000000 4000000000 6000000000 8000000000"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libbz2-dev libdivsufsort-dev libjsoncpp-dev libssl-dev libmpfr-dev libgmp-dev python3-numpy
+
+      - name: Build NIST SP 800-90B tool
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/results"
+          git clone --depth 1 https://github.com/usnistgov/SP800-90B_EntropyAssessment /tmp/ea
+          cd /tmp/ea/cpp && make -j4 non_iid iid
+          (cd /tmp/ea && git rev-parse HEAD) > "$GITHUB_WORKSPACE/results/nist_tool_commit.txt" || true
+
+      - name: Record source file metadata
+        run: |
+          mkdir -p results data
+          curl -sSIL "$URL" | tee results/source_headers.txt
+
+      - name: Download windows (HTTP range requests)
+        run: |
+          for off in $OFFSETS; do
+            start=$(( off * 2 )); end=$(( start + WINDOW * 2 - 1 ))
+            curl -sSL --fail -r "${start}-${end}" -o "data/raw_${off}.bin" "$URL"
+            sz=$(stat -c %s "data/raw_${off}.bin")
+            sha=$(sha256sum "data/raw_${off}.bin" | cut -d' ' -f1)
+            echo "offset_samples=${off} bytes=${start}-${end} size=${sz} sha256=${sha}" | tee -a results/windows.txt
+          done
+
+      - name: Extract symbols and run 90B (non-IID on all windows and mappings)
+        run: |
+          for off in $OFFSETS; do
+            python3 scripts/extract.py "data/raw_${off}.bin" "data/w${off}" --count "$WINDOW"
+            mkdir -p "results/w${off}"
+            cp "data/w${off}_stats.txt" "results/w${off}/stats.txt"
+            for v in low8:8 q8:8 high4:4; do
+              name=${v%%:*}; bits=${v##*:}
+              /tmp/ea/cpp/ea_non_iid -i -a -v "data/w${off}_${name}.bin" "$bits" > "results/w${off}/${name}_non_iid.txt"
+            done
+          done
+
+      - name: IID tests on the first window (slow permutation tests)
+        run: |
+          for v in low8:8 q8:8; do
+            name=${v%%:*}; bits=${v##*:}
+            /tmp/ea/cpp/ea_iid -i -a -v "data/w0_${name}.bin" "$bits" > "results/w0/${name}_iid.txt" || true
+          done
+
+      - name: Summarise
+        run: python3 scripts/summarise.py results > results/SUMMARY.md && cat results/SUMMARY.md
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          git commit -m "Add SP 800-90B results [skip ci]" || echo "nothing to commit"
+          git push
