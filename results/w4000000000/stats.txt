@@ -1,0 +1,4 @@
+samples=1000000 offset=0
+min=1549 max=2475 mean=2061.95 std=80.69
+values_above_4095=0
+distinct_12bit_values=761
