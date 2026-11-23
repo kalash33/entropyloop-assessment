@@ -1,0 +1,16 @@
+# SP 800-90B health-test replay, 2026-11-23T17:12Z
+window offset_samples=0 sha256=eaae709f3ad331f6c8a38f22ba25a39e83d458731719c0f94c6a25b5a39ad246
+file=raw_0.bin H=4 rct_cutoff=11 apt_cutoff=78/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=11 first_rct_fail=0 first_apt_fail=0
+file=raw_0.bin H=6 rct_cutoff=8 apt_cutoff=35/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=11 first_rct_fail=0 first_apt_fail=0
+window offset_samples=2000000000 sha256=0d82cb4e41f228e8581aacf32107b01462d61759eeb4238bea0deff176a5b5bf
+file=raw_2000000000.bin H=4 rct_cutoff=11 apt_cutoff=78/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=9 first_rct_fail=0 first_apt_fail=0
+file=raw_2000000000.bin H=6 rct_cutoff=8 apt_cutoff=35/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=9 first_rct_fail=0 first_apt_fail=0
+window offset_samples=4000000000 sha256=ffc284ad196688e672da9e06998d7e1686212dd106e70ef7da4d3805bf07d074
+file=raw_4000000000.bin H=4 rct_cutoff=11 apt_cutoff=78/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=10 first_rct_fail=0 first_apt_fail=0
+file=raw_4000000000.bin H=6 rct_cutoff=8 apt_cutoff=35/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=10 first_rct_fail=0 first_apt_fail=0
+window offset_samples=6000000000 sha256=be69bcf01414bbbdfe55a96215cdf7b3a761df6fd96f22de9dda382a6dfca4af
+file=raw_6000000000.bin H=4 rct_cutoff=11 apt_cutoff=78/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=12 first_rct_fail=0 first_apt_fail=0
+file=raw_6000000000.bin H=6 rct_cutoff=8 apt_cutoff=35/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=12 first_rct_fail=0 first_apt_fail=0
+window offset_samples=8000000000 sha256=407dde93c7730cc020ccc7122329de0c5c753502b919055326814f9dd927377d
+file=raw_8000000000.bin H=4 rct_cutoff=11 apt_cutoff=78/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=10 first_rct_fail=0 first_apt_fail=0
+file=raw_8000000000.bin H=6 rct_cutoff=8 apt_cutoff=35/512 samples=1000000 rct_failures=0 apt_failures=0 longest_run=3 highest_apt_count=10 first_rct_fail=0 first_apt_fail=0
