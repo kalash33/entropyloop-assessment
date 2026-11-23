@@ -35,8 +35,10 @@ Full table: [`results/SUMMARY.md`](results/SUMMARY.md).
 - **IID test:** failed on the first window for `low8` and `q8` (chi-square and permutation tests), so the non-IID estimates are the ones to use. That is the expected outcome for a physical source with some structure.
 - These are lower bounds for this capture only (see Limits).
 
+## Health tests
+SP 800-90B start-up and continuous health tests (Repetition Count and Adaptive Proportion) were written for the EntropyLoop firmware and replayed on the same five windows ([`results/health_replay.txt`](results/health_replay.txt)). No false alarms at a claimed 4 or 6 bits per sample. The longest repeat was 3 and the highest APT count 12, against cutoffs of 8 and 35 at 6 bits. This shows the tests do not misfire on healthy data; it does not show what they catch on a faulty device.
+
 ## Next steps
-- Startup and continuous health tests (Repetition Count and Adaptive Proportion, SP 800-90B section 4.4) in the firmware.
 - Controlled runs (laser off, temperature, dual-path vs single-path) to estimate how much of the measured entropy comes from the quantum process.
 - A restart test on a physical device.
 
