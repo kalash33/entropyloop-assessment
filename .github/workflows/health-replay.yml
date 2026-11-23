@@ -1,0 +1,49 @@
+name: Health-test replay on real data
+
+# Replays the same five 1M-sample windows used for the 800-90B run through the
+# SP 800-90B Repetition Count and Adaptive Proportion tests (health/), at
+# claimed H = 4 and H = 6, to check the false-alarm rate on real EntropyLoop data.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/health-replay.yml"
+      - "health/**"
+
+permissions:
+  contents: write
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    env:
+      URL: https://files.picoweather.net/samples.bin
+      WINDOW: "1000000"
+      OFFSETS: "0 2000000000 4000000000 6000000000 8000000000"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build replay tool
+        run: cc -std=c11 -O2 -Wall -Wextra -Werror -Ihealth -o replay health/replay.c health/health_tests.c
+
+      - name: Download windows and replay
+        run: |
+          mkdir -p data results
+          out=results/health_replay.txt
+          echo "# SP 800-90B health-test replay, $(date -u +%Y-%m-%dT%H:%MZ)" > $out
+          for off in $OFFSETS; do
+            start=$(( off * 2 )); end=$(( start + WINDOW * 2 - 1 ))
+            curl -sSL --fail -r "${start}-${end}" -o "data/raw_${off}.bin" "$URL"
+            echo "window offset_samples=${off} sha256=$(sha256sum data/raw_${off}.bin | cut -d' ' -f1)" >> $out
+            for h in 4 6; do ./replay "data/raw_${off}.bin" "$h" | sed "s#data/##" >> $out; done
+          done
+          cat $out
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/health_replay.txt
+          git commit -m "Add health-test replay results [skip ci]" || echo "nothing to commit"
+          git pull --rebase && git push
